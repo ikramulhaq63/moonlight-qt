@@ -11,7 +11,6 @@
 #include <QCursor>
 #include <QElapsedTimer>
 #include <QFile>
-
 // Don't let SDL hook our main function, since Qt is already
 // doing the same thing. This needs to be before any headers
 // that might include SDL.h themselves.
@@ -28,6 +27,7 @@
 #include <openssl/ssl.h>
 #endif
 
+#include "streaming/CustomNetworkManager.h"
 #include "cli/listapps.h"
 #include "cli/quitstream.h"
 #include "cli/startstream.h"
@@ -685,6 +685,7 @@ int main(int argc, char *argv[])
                                                    {
                                                        return new StreamingPreferences(qmlEngine);
                                                    });
+    qmlRegisterType<CustomNetworkManager>("CustomNetwork", 1, 0, "CustomNetworkManager");
 
     // Create the identity manager on the main thread
     IdentityManager::get();

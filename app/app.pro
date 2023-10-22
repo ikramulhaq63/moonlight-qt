@@ -183,6 +183,7 @@ SOURCES += \
     streaming/session.cpp \
     streaming/audio/audio.cpp \
     streaming/audio/renderers/sdlaud.cpp \
+    streaming/CustomNetworkManager.cpp \
     gui/computermodel.cpp \
     gui/appmodel.cpp \
     streaming/streamutils.cpp \
@@ -214,6 +215,7 @@ HEADERS += \
     cli/quitstream.h \
     cli/startstream.h \
     settings/streamingpreferences.h \
+    streaming/CustomNetworkManager.h \
     streaming/input/input.h \
     streaming/session.h \
     streaming/audio/renderers/renderer.h \
@@ -424,6 +426,10 @@ QML_IMPORT_PATH =
 
 # Additional import path used to resolve QML modules just for Qt Quick Designer
 QML_DESIGNER_IMPORT_PATH =
+
+QQmlApplicationEngine {
+    qmlProtectModule("Qt.Network", 1);
+}
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../moonlight-common-c/release/ -lmoonlight-common-c
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../moonlight-common-c/debug/ -lmoonlight-common-c

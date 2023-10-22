@@ -3,6 +3,9 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.2
 import QtQuick.Window 2.2
 
+// import QtNetwork 2.9
+// import Qt.labs.folderlistmodel 2.15
+import CustomNetwork 1.0
 import StreamingPreferences 1.0
 import ComputerManager 1.0
 import SdlGamepadKeyNavigation 1.0
@@ -165,16 +168,16 @@ Flickable {
                                     }
                                 }
 
-                                // Insert this display's resolution if it's not a duplicate
-                                if (indexToAdd >= 0) {
-                                    resolutionListModel.insert(indexToAdd,
-                                                               {
-                                                                   "text": "Native ("+screenRect.width+"x"+screenRect.height+")",
-                                                                   "video_width": ""+screenRect.width,
-                                                                   "video_height": ""+screenRect.height,
-                                                                   "is_custom": false
-                                                               })
-                                }
+                                // // Insert this display's resolution if it's not a duplicate
+                                // if (indexToAdd >= 0) {
+                                //     resolutionListModel.insert(indexToAdd,
+                                //                                {
+                                //                                    "text": "Native ("+screenRect.width+"x"+screenRect.height+")",
+                                //                                    "video_width": ""+screenRect.width,
+                                //                                    "video_height": ""+screenRect.height,
+                                //                                    "is_custom": false
+                                //                                })
+                                // }
                             }
 
                             // Prune resolutions that are over the decoder's maximum
@@ -207,24 +210,24 @@ Flickable {
                                 }
                             }
 
-                            if (!index_set) {
-                                // We did not find a match. This must be a custom resolution.
-                                resolutionListModel.append({
-                                                               "text": "Custom ("+StreamingPreferences.width+"x"+StreamingPreferences.height+")",
-                                                               "video_width": ""+StreamingPreferences.width,
-                                                               "video_height": ""+StreamingPreferences.height,
-                                                               "is_custom": true
-                                                           })
-                                currentIndex = resolutionListModel.count - 1
-                            }
-                            else {
-                                resolutionListModel.append({
-                                                               "text": "Custom",
-                                                               "video_width": "",
-                                                               "video_height": "",
-                                                               "is_custom": true
-                                                           })
-                            }
+                            // if (!index_set) {
+                            //     // We did not find a match. This must be a custom resolution.
+                            //     resolutionListModel.append({
+                            //                                    "text": "Custom ("+StreamingPreferences.width+"x"+StreamingPreferences.height+")",
+                            //                                    "video_width": ""+StreamingPreferences.width,
+                            //                                    "video_height": ""+StreamingPreferences.height,
+                            //                                    "is_custom": true
+                            //                                })
+                            //     currentIndex = resolutionListModel.count - 1
+                            // }
+                            // else {
+                            //     resolutionListModel.append({
+                            //                                    "text": "Custom",
+                            //                                    "video_width": "",
+                            //                                    "video_height": "",
+                            //                                    "is_custom": true
+                            //                                })
+                            // }
 
                             // Since we don't call activate() here, we need to trigger
                             // width calculation manually
@@ -258,12 +261,6 @@ Flickable {
                                 video_height: "1440"
                                 is_custom: false
                             }
-                            ListElement {
-                                text: qsTr("4K")
-                                video_width: "3840"
-                                video_height: "2160"
-                                is_custom: false
-                            }
                         }
 
                         function updateBitrateForSelection() {
@@ -275,10 +272,17 @@ Flickable {
                                 StreamingPreferences.width = selectedWidth
                                 StreamingPreferences.height = selectedHeight
 
-                                StreamingPreferences.bitrateKbps = StreamingPreferences.getDefaultBitrate(StreamingPreferences.width,
-                                                                                                          StreamingPreferences.height,
-                                                                                                          StreamingPreferences.fps);
-                                slider.value = StreamingPreferences.bitrateKbps
+                                if (selectedHeight === 720) StreamingPreferences.bitrateKbps = 5000
+                                else if (selectedHeight === 1080) StreamingPreferences.bitrateKbps = 10000
+                                else if (selectedHeight === 1440) StreamingPreferences.bitrateKbps = 15000
+                                // else StreamingPreferences.bitrateKbps = StreamingPreferences.getDefaultBitrate(StreamingPreferences.width,
+                                //                                                                                   StreamingPreferences.height,
+                                //                                                                                   StreamingPreferences.fps);
+
+                                // StreamingPreferences.bitrateKbps = StreamingPreferences.getDefaultBitrate(StreamingPreferences.width,
+                                //                                                                           StreamingPreferences.height,
+                                //                                                                           StreamingPreferences.fps);
+                                // slider.value = StreamingPreferences.bitrateKbps
                             }
 
                             lastIndexValue = currentIndex
@@ -493,104 +497,104 @@ Flickable {
 
                                 var fps = fpsField.text ? fpsField.text : fpsField.placeholderText
 
-                                // Find and update the custom entry
-                                for (var i = 0; i < fpsListModel.count; i++) {
-                                    if (fpsListModel.get(i).is_custom) {
-                                        fpsListModel.setProperty(i, "video_fps", fps)
-                                        fpsListModel.setProperty(i, "text", qsTr("Custom (%1 FPS)").arg(fps))
+                                // // Find and update the custom entry
+                                // for (var i = 0; i < fpsListModel.count; i++) {
+                                //     if (fpsListModel.get(i).is_custom) {
+                                //         fpsListModel.setProperty(i, "video_fps", fps)
+                                //         fpsListModel.setProperty(i, "text", qsTr("Custom (%1 FPS)").arg(fps))
 
-                                        // Now update the bitrate using the custom resolution
-                                        fpsComboBox.currentIndex = i
-                                        fpsComboBox.updateBitrateForSelection()
+                                //         // Now update the bitrate using the custom resolution
+                                //         fpsComboBox.currentIndex = i
+                                //         fpsComboBox.updateBitrateForSelection()
 
-                                        // Update the combobox width too
-                                        fpsComboBox.recalculateWidth()
-                                        break
-                                    }
-                                }
+                                //         // Update the combobox width too
+                                //         fpsComboBox.recalculateWidth()
+                                //         break
+                                //     }
+                                // }
                             }
 
-                            ColumnLayout {
-                                Label {
-                                    text: qsTr("Enter a custom frame rate:")
-                                    font.bold: true
-                                }
+                            // ColumnLayout {
+                            //     Label {
+                            //         text: qsTr("Enter a custom frame rate:")
+                            //         font.bold: true
+                            //     }
 
-                                RowLayout {
-                                    TextField {
-                                        id: fpsField
-                                        maximumLength: 4
-                                        inputMethodHints: Qt.ImhDigitsOnly
-                                        placeholderText: fpsListModel.get(fpsComboBox.currentIndex).video_fps
-                                        validator: IntValidator{bottom:10; top:9999}
-                                        focus: true
+                            //     RowLayout {
+                            //         TextField {
+                            //             id: fpsField
+                            //             maximumLength: 4
+                            //             inputMethodHints: Qt.ImhDigitsOnly
+                            //             placeholderText: fpsListModel.get(fpsComboBox.currentIndex).video_fps
+                            //             validator: IntValidator{bottom:10; top:9999}
+                            //             focus: true
 
-                                        onTextChanged: {
-                                            // standardButton() was added in Qt 5.10, so we must check for it first
-                                            if (customFpsDialog.standardButton) {
-                                                customFpsDialog.standardButton(Dialog.Ok).enabled = customFpsDialog.isInputValid()
-                                            }
-                                        }
+                            //             onTextChanged: {
+                            //                 // standardButton() was added in Qt 5.10, so we must check for it first
+                            //                 if (customFpsDialog.standardButton) {
+                            //                     customFpsDialog.standardButton(Dialog.Ok).enabled = customFpsDialog.isInputValid()
+                            //                 }
+                            //             }
 
-                                        Keys.onReturnPressed: {
-                                            customFpsDialog.accept()
-                                        }
+                            //             Keys.onReturnPressed: {
+                            //                 customFpsDialog.accept()
+                            //             }
 
-                                        Keys.onEnterPressed: {
-                                            customFpsDialog.accept()
-                                        }
-                                    }
-                                }
-                            }
+                            //             Keys.onEnterPressed: {
+                            //                 customFpsDialog.accept()
+                            //             }
+                            //         }
+                            //     }
+                            // }
                         }
 
-                        function addRefreshRateOrdered(fpsListModel, refreshRate, description, custom) {
-                            var indexToAdd = 0
-                            for (var j = 0; j < fpsListModel.count; j++) {
-                                var existing_fps = parseInt(fpsListModel.get(j).video_fps);
+                        // function addRefreshRateOrdered(fpsListModel, refreshRate, description, custom) {
+                        //     var indexToAdd = 0
+                        //     for (var j = 0; j < fpsListModel.count; j++) {
+                        //         var existing_fps = parseInt(fpsListModel.get(j).video_fps);
 
-                                if (refreshRate === existing_fps || (custom && fpsListModel.get(j).is_custom)) {
-                                    // Duplicate entry, skip
-                                    indexToAdd = -1
-                                    break
-                                }
-                                else if (refreshRate > existing_fps) {
-                                    // Candidate entrypoint after this entry
-                                    indexToAdd = j + 1
-                                }
-                            }
+                        //         if (refreshRate === existing_fps || (custom && fpsListModel.get(j).is_custom)) {
+                        //             // Duplicate entry, skip
+                        //             indexToAdd = -1
+                        //             break
+                        //         }
+                        //         else if (refreshRate > existing_fps) {
+                        //             // Candidate entrypoint after this entry
+                        //             indexToAdd = j + 1
+                        //         }
+                        //     }
 
-                            // Insert this frame rate if it's not a duplicate
-                            if (indexToAdd >= 0) {
-                                // Custom values always go at the end of the list
-                                if (custom) {
-                                    indexToAdd = fpsListModel.count
-                                }
+                        //     // Insert this frame rate if it's not a duplicate
+                        //     if (indexToAdd >= 0) {
+                        //         // Custom values always go at the end of the list
+                        //         if (custom) {
+                        //             indexToAdd = fpsListModel.count
+                        //         }
 
-                                fpsListModel.insert(indexToAdd,
-                                                    {
-                                                        "text": description,
-                                                        "video_fps": ""+refreshRate,
-                                                        "is_custom": custom
-                                                    })
-                            }
+                        //         fpsListModel.insert(indexToAdd,
+                        //                             {
+                        //                                 "text": description,
+                        //                                 "video_fps": ""+refreshRate,
+                        //                                 "is_custom": custom
+                        //                             })
+                        //     }
 
-                            return indexToAdd
-                        }
+                        //     return indexToAdd
+                        // }
 
                         function reinitialize() {
                             // Add native refresh rate for all attached displays
-                            var done = false
-                            for (var displayIndex = 0; !done; displayIndex++) {
-                                var refreshRate = SystemProperties.getRefreshRate(displayIndex);
-                                if (refreshRate === 0) {
-                                    // Exceeded max count of displays
-                                    done = true
-                                    break
-                                }
+                            // var done = false
+                            // for (var displayIndex = 0; !done; displayIndex++) {
+                            //     var refreshRate = SystemProperties.getRefreshRate(displayIndex);
+                            //     if (refreshRate === 0) {
+                            //         // Exceeded max count of displays
+                            //         done = true
+                            //         break
+                            //     }
 
-                                addRefreshRateOrdered(fpsListModel, refreshRate, qsTr("%1 FPS").arg(refreshRate), false)
-                            }
+                            //     addRefreshRateOrdered(fpsListModel, refreshRate, qsTr("%1 FPS").arg(refreshRate), false)
+                            // }
 
                             var saved_fps = StreamingPreferences.fps
                             var found = false
@@ -628,11 +632,6 @@ Flickable {
                             id: fpsListModel
                             // Other elements may be added at runtime
                             ListElement {
-                                text: qsTr("30 FPS")
-                                video_fps: "30"
-                                is_custom: false
-                            }
-                            ListElement {
                                 text: qsTr("60 FPS")
                                 video_fps: "60"
                                 is_custom: false
@@ -652,46 +651,88 @@ Flickable {
                             }
                         }
                     }
-                }
 
-                Label {
-                    width: parent.width
-                    id: bitrateTitle
-                    text: qsTr("Video bitrate:")
-                    font.pointSize: 12
-                    wrapMode: Text.Wrap
-                }
-
-                Label {
-                    width: parent.width
-                    id: bitrateDesc
-                    text: qsTr("Lower the bitrate on slower connections. Raise the bitrate to increase image quality.")
-                    font.pointSize: 9
-                    wrapMode: Text.Wrap
-                }
-
-                Slider {
-                    id: slider
-
-                    value: StreamingPreferences.bitrateKbps
-
-                    stepSize: 500
-                    from : 500
-                    to: 150000
-
-                    snapMode: "SnapOnRelease"
-                    width: Math.min(bitrateDesc.implicitWidth, parent.width)
-
-                    onValueChanged: {
-                        bitrateTitle.text = qsTr("Video bitrate: %1 Mbps").arg(value / 1000.0)
-                        StreamingPreferences.bitrateKbps = value
+                    CustomNetworkManager {
+                        id: networkManager
                     }
 
-                    Component.onCompleted: {
-                        // Refresh the text after translations change
-                        languageChanged.connect(onValueChanged)
+                    Button {
+                        text: "Send Request"
+                        onClicked: {
+                            networkManager.sendRequest()
+
+                            // Create a timestamp for the file name
+                            // var timestamp = new Date().toISOString().replace(/[-T:]/g, "");
+
+                            // // Create a new file with the timestamp
+                            // var file = Qt.createFile(this, timestamp + ".txt");
+                            // if (file.open(Qt.WriteOnly | Qt.Text)) {
+                            //     // Define the HTTP request
+                            //     var request = new XMLHttpRequest();
+                            //     request.open("POST", "http://127.0.0.1:5679/api/endpoint", true);
+                            //     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+                            //     // Handle the response
+                            //     request.onreadystatechange = function() {
+                            //         if (request.readyState === XMLHttpRequest.DONE) {
+                            //             if (request.status === 200) {
+                            //                 var response = request.responseText;
+                            //                 file.write(response);
+                            //                 file.close();
+                            //                 console.log("Response written to file: " + file.fileName);
+                            //             } else {
+                            //                 console.error("HTTP request failed with status: " + request.status);
+                            //             }
+                            //         }
+                            //     };
+
+                            //     // Send the POST request with data
+                            //     request.send("bandwidth=100Mbps");
+                            // } else {
+                            //     console.error("Failed to create the file.");
+                            // }
+                        }
                     }
                 }
+
+                // Label {
+                //     width: parent.width
+                //     id: bitrateTitle
+                //     text: qsTr("Video bitrate:")
+                //     font.pointSize: 12
+                //     wrapMode: Text.Wrap
+                // }
+
+                // Label {
+                //     width: parent.width
+                //     id: bitrateDesc
+                //     text: qsTr("Lower the bitrate on slower connections. Raise the bitrate to increase image quality.")
+                //     font.pointSize: 9
+                //     wrapMode: Text.Wrap
+                // }
+
+                // Slider {
+                //     id: slider
+
+                //     value: StreamingPreferences.bitrateKbps
+
+                //     stepSize: 500
+                //     from : 500
+                //     to: 150000
+
+                //     snapMode: "SnapOnRelease"
+                //     width: Math.min(bitrateDesc.implicitWidth, parent.width)
+
+                //     onValueChanged: {
+                //         bitrateTitle.text = qsTr("Video bitrate: %1 Mbps").arg(value / 1000.0)
+                //         StreamingPreferences.bitrateKbps = value
+                //     }
+
+                //     Component.onCompleted: {
+                //         // Refresh the text after translations change
+                //         languageChanged.connect(onValueChanged)
+                //     }
+                // }
 
                 Label {
                     width: parent.width
