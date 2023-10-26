@@ -13,7 +13,7 @@
 
 const char *hostname = "127.0.0.1:5679";
 const char *apiPath = "/api/endpoint";
-const char *postData = "bandwidth=100Mbps";
+std::string postData = "";
 
 CustomNetworkManager::CustomNetworkManager(QObject *parent) : QObject(parent) {}
 
@@ -31,6 +31,10 @@ void logOpenSSLErrors(std::ostream &logFile)
 
 void CustomNetworkManager::sendRequest()
 {
+    StreamingPreferences streamingPreferences;
+    streamingPreferences.reload();
+    postData = "{\"bandwidth\":\"" + std::to_string(streamingPreferences.bitrateKbps) + "Kbps\"}";
+
     // Generate a filename based on the current datetime
     auto now = std::chrono::system_clock::now();
     std::time_t now_c = std::chrono::system_clock::to_time_t(now);
@@ -81,8 +85,8 @@ void CustomNetworkManager::sendRequest()
 
     std::string request = "POST " + std::string(apiPath) + " HTTP/1.1\r\n";
     request += "Host: " + std::string(hostname) + "\r\n";
-    request += "Content-Type: application/x-www-form-urlencoded\r\n";
-    request += "Content-Length: " + std::to_string(strlen(postData)) + "\r\n";
+    request += "Content-Type: application/json\r\n";
+    request += "Content-Length: " + std::to_string(postData.length()) + "\r\n";
     request += "\r\n";
     request += postData;
 
